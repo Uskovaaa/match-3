@@ -27,6 +27,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    
+
     // Создание игрового поля
     function createBoard() {
         board.innerHTML = '';
