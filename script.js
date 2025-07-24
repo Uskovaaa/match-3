@@ -5,8 +5,9 @@ document.addEventListener('DOMContentLoaded', () => {
     let selected = null;
     const ROWS = 6;
     const COLS = 6;
+    const timer = document.getElementById('timer');
 
-    // Элементы игры (иконки можно заменить на логотипы документов ЭТП)
+    // Элементы игры
     const elements = [
         { name: 'Аукцион', image: 'icons/icons8-аукцион-100.png' },
         { name: 'Закон', image: 'icons/icons8-закон-100.png' },
@@ -26,6 +27,23 @@ document.addEventListener('DOMContentLoaded', () => {
             };
         });
     }
+
+    //Закрытие модального окна
+    const gameOver = document.querySelector('.game_over');
+    const closeModal = document.querySelector('.close_modal');
+    closeModal.addEventListener('click', ()=> {
+        gameOver.classList.add('hide');
+    })
+    
+    let intervalId = setInterval(()=> {
+        if(timer.textContent == 0) {
+            clearInterval(intervalId);
+            gameOver.classList.remove('hide');
+        }
+        else {
+            timer.textContent--;
+        }
+    }, 1000);
 
     // Создание игрового поля
     function createBoard() {
