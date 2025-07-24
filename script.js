@@ -28,6 +28,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    
+
     //Закрытие модального окна
     const gameOver = document.querySelector('.game_over');
     const closeModal = document.querySelector('.close_modal');
