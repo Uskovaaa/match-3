@@ -2,11 +2,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const board = document.getElementById('board');
     const scoreElement = document.getElementById('score');
     let score = 0;
+    let counter = 0;
     let selected = null;
     const ROWS = 6;
     const COLS = 6;
-    const timer = document.getElementById('timer');
+    let timer = 300;
+    let intervalId;
+    const timerElement = document.getElementById('timer');
+    // const textModalGame = document.getElementById('text_modal_game');
+    const newGame = document.querySelector('.new_game');
 
+    
     // Элементы игры
     const elements = [
         { name: 'Аукцион', image: 'icons/icons8-аукцион-100.png' },
@@ -28,27 +34,58 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    
+    function startGame() {
+        modalGame.classList.remove('hide');
+        newGame.textContent = 'Начать игру';
+    }
+
+    //Запуск новой игры
+    newGame.addEventListener('click', () => {
+        modalGame.classList.add('hide');
+        score = 0;
+        scoreElement.textContent = score;
+        startTimer();
+        createBoard();
+    });
+
+    //Проверка очков
+    function checkScore() {
+        if (score >= 50) {
+            let textModalGame = document.createElement('span');
+            console.log(textModalGame);
+            textModalGame.getElementsById = 'text_modal_game';
+            textModalGame.textContent = `Вы победили! У вас ${score} очков!`;
+            newGame.textContent = 'Начать заново';
+            setTimeout(()=> modalGame.classList.remove('hide'), 650);
+            clearInterval(intervalId);
+        }
+    }
 
     //Закрытие модального окна
-    const gameOver = document.querySelector('.game_over');
+    const modalGame = document.querySelector('.modal_game');
     const closeModal = document.querySelector('.close_modal');
     closeModal.addEventListener('click', ()=> {
-        gameOver.classList.add('hide');
-    })
+        modalGame.classList.add('hide');
+    });
     
-    let intervalId = setInterval(()=> {
-        if(timer.textContent == 0) {
-            clearInterval(intervalId);
-            gameOver.classList.remove('hide');
-        }
-        else {
-            timer.textContent--;
-        }
-    }, 1000);
-
+    //Таймер
+    function startTimer() {
+         intervalId = setInterval(()=> {
+            if(timerElement.textContent == 0) {
+                clearInterval(intervalId);
+                modalGame.classList.remove('hide');              
+            }
+            else {
+                timerElement.textContent--;
+            }
+        }, 1000);
+    }
+            
     // Создание игрового поля
     function createBoard() {
+        if (counter == 0) startGame();
+        
+        timerElement.textContent = timer;
         board.innerHTML = '';
         for (let row = 0; row < ROWS; row++) {
             for (let col = 0; col < COLS; col++) {
@@ -56,9 +93,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 cell.className = 'cell';
                 cell.dataset.row = row;
                 cell.dataset.col = col;
-                
                 const randomElement = elements[Math.floor(Math.random() * elements.length)];
                 const img = document.createElement('img');
+
                 img.src = randomElement.image;
                 img.alt = randomElement.name;
                 
@@ -75,6 +112,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 board.appendChild(cell);
             }
         }
+        console.log(counter);
+        counter++;        
     }
 
     // Обработка клика
@@ -194,6 +233,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (matches.size > 0) {
             const matchCount = matches.size;
             score += matchCount * 10; // Умножаем на 10
+            checkScore()
             scoreElement.textContent = score;
 
             matches.forEach(index => {

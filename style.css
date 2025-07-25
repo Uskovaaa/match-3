@@ -49,7 +49,7 @@ h1 {
     justify-content: center;
 }
 
-.game_over {
+.modal_game {
    position: absolute;
    left: 50%;
    top: 50%;
@@ -57,12 +57,21 @@ h1 {
    z-index: 1;
    padding: 40px;
    background: white;
-   border-radius: 5px;
+   /* border-radius: 10px; */
    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
-.game_over.hide {
+.modal_game.hide {
     display: none;
+}
+
+.new_game {
+    margin-top: 10px;
+    padding: 10px;
+    background: #e9e9e9;
+    border: none;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.09);
+    cursor: pointer;
 }
 
 #time_over, #you_win {
@@ -76,6 +85,10 @@ h1 {
     padding: 5px;
     background: #cdcece;
     cursor: pointer;
+}
+
+.close_modal:hover {
+    background: #c7c7c7;
 }
 
 .cell {
