@@ -6,10 +6,10 @@ document.addEventListener('DOMContentLoaded', () => {
     let selected = null;
     const ROWS = 6;
     const COLS = 6;
-    let timer = 300;
+    let timer = 10;
     let intervalId;
     const timerElement = document.getElementById('timer');
-    // const textModalGame = document.getElementById('text_modal_game');
+    let textModalGame = document.createElement('span');
     const newGame = document.querySelector('.new_game');
 
     
@@ -42,18 +42,30 @@ document.addEventListener('DOMContentLoaded', () => {
     //Запуск новой игры
     newGame.addEventListener('click', () => {
         modalGame.classList.add('hide');
+        if(counter == 1) {
+            textModalGame.className = ('text_modal_game');
+            modalGame.prepend(textModalGame);
+            console.log(textModalGame);
+        }
         score = 0;
         scoreElement.textContent = score;
         startTimer();
         createBoard();
     });
 
+    //Проверка таймера
+    function checkTimer() {
+        if (timer == 0) {
+            modalGame.classList.remove('hide');
+            textModalGame.textContent = `Время истекло! У вас ${score} очков!`;
+            console.log(textModalGame);
+            newGame.textContent = 'Начать заново';
+        }
+    }
+
     //Проверка очков
     function checkScore() {
         if (score >= 50) {
-            let textModalGame = document.createElement('span');
-            console.log(textModalGame);
-            textModalGame.getElementsById = 'text_modal_game';
             textModalGame.textContent = `Вы победили! У вас ${score} очков!`;
             newGame.textContent = 'Начать заново';
             setTimeout(()=> modalGame.classList.remove('hide'), 650);
@@ -72,8 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function startTimer() {
          intervalId = setInterval(()=> {
             if(timerElement.textContent == 0) {
-                clearInterval(intervalId);
-                modalGame.classList.remove('hide');              
+                clearInterval(intervalId);             
             }
             else {
                 timerElement.textContent--;
@@ -233,7 +244,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (matches.size > 0) {
             const matchCount = matches.size;
             score += matchCount * 10; // Умножаем на 10
-            checkScore()
+            checkScore();
             scoreElement.textContent = score;
 
             matches.forEach(index => {
@@ -263,4 +274,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
     preloadImages();
     createBoard();
+    
 });
