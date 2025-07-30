@@ -7,12 +7,11 @@ document.addEventListener('DOMContentLoaded', () => {
     let selected = null;
     const ROWS = 6;
     const COLS = 6;
-    let timer = 300;
+    let timer = 10;
     let intervalId;
     const modalGame = document.querySelector('.modal_game');
     const timerElement = document.getElementById('timer');
     let textModalGame = document.querySelector('.text_modal_game');
-    let infoText = document.querySelector('.info_text');
     const newGame = document.querySelector('.new_game');
 
     
@@ -39,10 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function startGame() {
         modalGame.classList.remove('hide');
-        infoText.textContent = limitScore.toString();
-        infoText.style.fontWeight = '700';
-        console.log(infoText.textContent);
-        // textModalGame.textContent = `Наберите ${infoText.textContent} очков за ${timer} секунд!`;
+        textModalGame.innerHTML = `Наберите <span style="font-weight: 700">${limitScore}</span> очков за <span style="font-weight: 700">${timer}</span> секунд!`;
     }
 
     //Запуск новой игры
@@ -58,14 +54,14 @@ document.addEventListener('DOMContentLoaded', () => {
     //Проверка таймера
     function checkTimer() {
         modalGame.classList.remove('hide');
-        textModalGame.textContent = `Время истекло! У вас ${score} очков!`;
+        textModalGame.innerHTML = `Время истекло! У вас <span style="font-weight: 700">${score}</span> очков!`;
         newGame.textContent = 'Начать заново'; 
     }
 
     //Проверка очков
     function checkScore() {
         if (score >= limitScore) {
-            textModalGame.textContent = `Вы победили! У вас ${score} очков!`;
+            textModalGame.innerHTML = `Вы победили! У вас <span style="font-weight: 700">${score}</span> очков!`;
             newGame.textContent = 'Начать заново';
             setTimeout(()=> modalGame.classList.remove('hide'), 650);
             clearInterval(intervalId);
