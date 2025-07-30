@@ -51,6 +51,7 @@ h1 {
 
 .modal_game {
    position: absolute;
+   width: 80%;
    left: 50%;
    top: 50%;
    transform: translate(-50%, -50%);
@@ -64,6 +65,10 @@ h1 {
 .modal_game.hide {
     display: none;
 }
+
+/* .info_text {
+    font-weight: 700;
+} */
 
 .new_game {
     margin-top: 10px;

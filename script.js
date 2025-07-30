@@ -2,14 +2,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const board = document.getElementById('board');
     const scoreElement = document.getElementById('score');
     let score = 0;
+    let limitScore = 50;
     let counter = 0;
     let selected = null;
     const ROWS = 6;
     const COLS = 6;
-    let timer = 10;
+    let timer = 300;
     let intervalId;
+    const modalGame = document.querySelector('.modal_game');
     const timerElement = document.getElementById('timer');
-    let textModalGame = document.createElement('span');
+    let textModalGame = document.querySelector('.text_modal_game');
+    let infoText = document.querySelector('.info_text');
     const newGame = document.querySelector('.new_game');
 
     
@@ -36,17 +39,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function startGame() {
         modalGame.classList.remove('hide');
-        newGame.textContent = 'Начать игру';
+        infoText.textContent = limitScore.toString();
+        infoText.style.fontWeight = '700';
+        console.log(infoText.textContent);
+        // textModalGame.textContent = `Наберите ${infoText.textContent} очков за ${timer} секунд!`;
     }
 
     //Запуск новой игры
     newGame.addEventListener('click', () => {
         modalGame.classList.add('hide');
-        if(counter == 1) {
-            textModalGame.className = ('text_modal_game');
-            modalGame.prepend(textModalGame);
-            console.log(textModalGame);
-        }
+        
         score = 0;
         scoreElement.textContent = score;
         startTimer();
@@ -55,17 +57,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     //Проверка таймера
     function checkTimer() {
-        if (timer == 0) {
-            modalGame.classList.remove('hide');
-            textModalGame.textContent = `Время истекло! У вас ${score} очков!`;
-            console.log(textModalGame);
-            newGame.textContent = 'Начать заново';
-        }
+        modalGame.classList.remove('hide');
+        textModalGame.textContent = `Время истекло! У вас ${score} очков!`;
+        newGame.textContent = 'Начать заново'; 
     }
 
     //Проверка очков
     function checkScore() {
-        if (score >= 50) {
+        if (score >= limitScore) {
             textModalGame.textContent = `Вы победили! У вас ${score} очков!`;
             newGame.textContent = 'Начать заново';
             setTimeout(()=> modalGame.classList.remove('hide'), 650);
@@ -74,16 +73,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     //Закрытие модального окна
-    const modalGame = document.querySelector('.modal_game');
-    const closeModal = document.querySelector('.close_modal');
-    closeModal.addEventListener('click', ()=> {
-        modalGame.classList.add('hide');
-    });
+    // const closeModal = document.querySelector('.close_modal');
+    // closeModal.addEventListener('click', ()=> {
+    //     modalGame.classList.add('hide');
+    // });
     
     //Таймер
     function startTimer() {
          intervalId = setInterval(()=> {
             if(timerElement.textContent == 0) {
+                checkTimer();
                 clearInterval(intervalId);             
             }
             else {
@@ -123,7 +122,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 board.appendChild(cell);
             }
         }
-        console.log(counter);
         counter++;        
     }
 
@@ -274,5 +272,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
     preloadImages();
     createBoard();
-    
 });
