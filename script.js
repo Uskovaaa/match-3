@@ -2,18 +2,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const board = document.getElementById('board');
     const scoreElement = document.getElementById('score');
     let score = 0;
-    let limitScore = 50;
+    let limitScore = 1000;
     let counter = 0;
     let selected = null;
     const ROWS = 6;
     const COLS = 6;
-    let timer = 10;
+    let timer = 300;
     let intervalId;
     const modalGame = document.querySelector('.modal_game');
     const timerElement = document.getElementById('timer');
     let textModalGame = document.querySelector('.text_modal_game');
     const newGame = document.querySelector('.new_game');
-
+    const pause = document.querySelector('.pause');
     
     // Элементы игры
     const elements = [
@@ -36,6 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    //Начало игры
     function startGame() {
         modalGame.classList.remove('hide');
         textModalGame.innerHTML = `Наберите <span style="font-weight: 700">${limitScore}</span> очков за <span style="font-weight: 700">${timer}</span> секунд!`;
@@ -44,7 +45,6 @@ document.addEventListener('DOMContentLoaded', () => {
     //Запуск новой игры
     newGame.addEventListener('click', () => {
         modalGame.classList.add('hide');
-        
         score = 0;
         scoreElement.textContent = score;
         startTimer();
@@ -77,21 +77,44 @@ document.addEventListener('DOMContentLoaded', () => {
     //Таймер
     function startTimer() {
          intervalId = setInterval(()=> {
-            if(timerElement.textContent == 0) {
+            if(timer == 0) {
                 checkTimer();
                 clearInterval(intervalId);             
             }
             else {
-                timerElement.textContent--;
+                timer--;
+                timerElement.textContent = timer;
             }
         }, 1000);
     }
+
+    //Пауза
+    let isPaused = false; // Добавляем флаг паузы
+    pause.addEventListener('click', () => {
+        if (isPaused) {
+            // Если игра на паузе - возобновляем
+            modalGame.classList.add('hide');
+            newGame.classList.remove('hide');
+            pause.innerHTML = `<img src="/icons/icons8-pause-30.png" alt="||" id="pause">`
+            startTimer(); // Запускаем таймер снова
+        } else {
+            // Если игра идет - ставим на паузу
+            modalGame.classList.remove('hide');
+            newGame.classList.add('hide');
+            textModalGame.textContent = 'Пауза';
+            clearInterval(intervalId);
+            pause.innerHTML = `<img src="/icons/icons8-воспроизведение-30.png" alt="||" id="pause">` // Останавливаем таймер
+        }
+        isPaused = !isPaused; // Меняем состояние паузы
+    });
             
     // Создание игрового поля
     function createBoard() {
         if (counter == 0) startGame();
+        console.log(counter);
         
         timerElement.textContent = timer;
+
         board.innerHTML = '';
         for (let row = 0; row < ROWS; row++) {
             for (let col = 0; col < COLS; col++) {
@@ -99,27 +122,50 @@ document.addEventListener('DOMContentLoaded', () => {
                 cell.className = 'cell';
                 cell.dataset.row = row;
                 cell.dataset.col = col;
-                const randomElement = elements[Math.floor(Math.random() * elements.length)];
+                
+                // Выбираем элемент, который не создаст совпадений
+                const randomElement = getValidElement(row, col);
                 const img = document.createElement('img');
-
                 img.src = randomElement.image;
                 img.alt = randomElement.name;
-                
-                if (!randomElement.loaded) {
-                    img.style.opacity = '0'; // Скрываем до загрузки
-                    img.onload = () => {
-                        img.style.opacity = '1';
-                    };
-                }
                 
                 cell.appendChild(img);
                 cell.dataset.type = randomElement.name;
                 cell.addEventListener('click', () => handleClick(cell));
                 board.appendChild(cell);
-            }
+            } 
         }
-        counter++;        
+        setTimeout(checkBoard, 100);
+        counter++; 
     }
+
+    // Выбирает элемент, который не создаст линию из 3+
+    function getValidElement(row, col) {
+        const prev1 = getCellType(row, col - 1); // Слева
+        const prev2 = getCellType(row, col - 2); // Два слева
+        const prev3 = getCellType(row - 1, col); // Сверху
+        const prev4 = getCellType(row - 2, col); // Два сверху
+            
+        // Фильтруем элементы, исключая те, что создадут совпадение
+        const validElements = elements.filter(element => {
+            if (prev1 && prev2 && prev1 === prev2 && prev1 === element.name) return false;
+            if (prev3 && prev4 && prev3 === prev4 && prev3 === element.name) return false;
+            return true;
+        });
+            
+        // Если все варианты ведут к совпадению, берём случайный (редкий случай)
+        return validElements.length > 0 
+            ? validElements[Math.floor(Math.random() * validElements.length)]
+            : elements[Math.floor(Math.random() * elements.length)];
+    }
+
+        // Возвращает тип ячейки по координатам (для проверки при генерации)
+        function getCellType(row, col) {
+            if (row < 0 || col < 0) return null;
+            const cell = document.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
+            return cell ? cell.dataset.type : null;                       
+        }
+        
 
     // Обработка клика
     function handleClick(cell) {
@@ -142,6 +188,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Сбрасываем выделение
                 selected.style.backgroundColor = '';
                 selected = null;
+                setTimeout(checkBoard, 300); // Проверка после анимации
             } else {
                 // Клик на другую ячейку — сбрасываем выбор
                 selected.style.backgroundColor = '';
@@ -265,6 +312,69 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         return false; // Совпадений нет
     }
+
+    function checkBoard() {
+    const cells = document.querySelectorAll('.cell');
+    let matches = new Set();
+
+    // Проверка всех строк и столбцов
+    for (let row = 0; row < ROWS; row++) {
+        for (let col = 0; col < COLS - 2; col++) {
+            const index = row * COLS + col;
+            // Горизонтальные совпадения
+            if (cells[index].dataset.type === cells[index + 1].dataset.type && 
+                cells[index].dataset.type === cells[index + 2].dataset.type) {
+                let matchLength = 3;
+                while (col + matchLength < COLS && 
+                       cells[index].dataset.type === cells[index + matchLength].dataset.type) {
+                    matches.add(index + matchLength);
+                    matchLength++;
+                }
+                matches.add(index).add(index + 1).add(index + 2);
+                col += matchLength - 1;
+            }
+        }
+    }
+
+    for (let col = 0; col < COLS; col++) {
+        for (let row = 0; row < ROWS - 2; row++) {
+            const index = row * COLS + col;
+            // Вертикальные совпадения
+            if (cells[index].dataset.type === cells[index + COLS].dataset.type && 
+                cells[index].dataset.type === cells[index + 2 * COLS].dataset.type) {
+                let matchLength = 3;
+                while (row + matchLength < ROWS && 
+                       cells[index].dataset.type === cells[index + matchLength * COLS].dataset.type) {
+                    matches.add(index + matchLength * COLS);
+                    matchLength++;
+                }
+                matches.add(index).add(index + COLS).add(index + 2 * COLS);
+                row += matchLength - 1;
+            }
+        }
+    }
+
+    // Если есть совпадения — удаляем их и проверяем поле снова
+    if (matches.size > 0) {
+        replaceMatches(matches);
+        checkBoard(); // Рекурсивная проверка (на случай новых совпадений)
+    }
+}
+
+// Заменяет совпавшие ячейки новыми
+function replaceMatches(matches) {
+    const cells = document.querySelectorAll('.cell');
+    matches.forEach(index => {
+        const cell = cells[index];
+        const img = cell.querySelector('img');
+        const randomElement = elements[Math.floor(Math.random() * elements.length)];
+        img.src = randomElement.image;
+        img.alt = randomElement.name;
+        cell.dataset.type = randomElement.name;
+    });
+    score += matches.size * 10;
+    scoreElement.textContent = score;
+}
 
     preloadImages();
     createBoard();

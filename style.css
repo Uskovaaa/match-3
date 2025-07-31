@@ -35,10 +35,17 @@ h1 {
     justify-content:space-around;
 }
 
-.timer, .score, .lives {
+.timer, .score, .pause {
     font-size: 18px;
     margin-bottom: 20px;
+    padding: 5px;
     color: #2c3e50;
+    cursor: pointer;
+}
+
+#pause {
+    max-width: 80%;
+    max-height: 80%;
 }
 
 .board {
@@ -73,6 +80,10 @@ h1 {
     border: none;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.09);
     cursor: pointer;
+}
+
+.new_game.hide {
+    display: none;
 }
 
 #time_over, #you_win {
